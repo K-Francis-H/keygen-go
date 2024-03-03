@@ -294,7 +294,20 @@ func (v *verifier) publicKeyBytes() ([]byte, error) {
 		return nil, ErrPublicKeyMissing
 	}
 
-	key, err := hex.DecodeString(v.PublicKey)
+	var decodedPublicKey string
+	b64PublicKeyBytes, err := base64.StdEncoding.DecodeString(v.PublicKey)
+	if b64PublicKeyBytes != nil && err == nil {
+		decodedPublicKey = string(b64PublicKeyBytes[:])
+	}
+
+	var toDecode string
+	if decodedPublicKey != "" {
+		toDecode = decodedPublicKey
+	} else {
+		toDecode = v.PublicKey
+	} 
+
+	key, err := hex.DecodeString(toDecode)
 	if err != nil {
 		return nil, ErrPublicKeyInvalid
 	}
